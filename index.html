@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drop Chance Calculator</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to bottom right, #6dd5ed, #2193b0);
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+    }
+    h1 {
+        margin-bottom: 20px;
+    }
+    input, button {
+        padding: 10px;
+        margin: 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+    button {
+        background-color: #ff7e5f;
+        color: white;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #feb47b;
+    }
+    .result, .math {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        text-align: left;
+        background: rgba(0,0,0,0.2);
+        padding: 15px;
+        border-radius: 8px;
+        white-space: pre-line;
+    }
+</style>
+</head>
+<body>
+    <h1>Drop Chance Calculator</h1>
+    <label>Codes per drop: <input type="number" id="codes" min="1"></label><br>
+    <label>People per drop: <input type="number" id="people" min="1"></label><br>
+    <label>Hours remaining today: <input type="number" id="hours" min="0" max="24"></label><br>
+    <label>Drops you will join: <input type="number" id="drops" min="1"></label><br>
+    <button id="calcBtn">Calculate</button>
+
+    <div class="result" id="result"></div>
+    <div class="math" id="mathSteps"></div>
+
+    <script>
+        document.getElementById('calcBtn').addEventListener('click', () => {
+            const c = parseFloat(document.getElementById('codes').value);
+            const M = parseFloat(document.getElementById('people').value);
+            const hoursRemaining = parseFloat(document.getElementById('hours').value);
+            const k = parseFloat(document.getElementById('drops').value);
+
+            const resultElem = document.getElementById('result');
+            const mathElem = document.getElementById('mathSteps');
+
+            if (isNaN(c) || isNaN(M) || isNaN(hoursRemaining) || isNaN(k) || c <= 0 || M <= 0 || hoursRemaining < 0 || k <= 0) {
+                resultElem.textContent = "Please enter valid positive numbers.";
+                mathElem.textContent = "";
+                return;
+            }
+
+            const dropsLeftToday = hoursRemaining * 2; // 2 drops per hour
+            const totalCodesToday = dropsLeftToday * c;
+            const chancePerDrop = c / M;
+            const chanceAtLeastOnce = 1 - Math.pow(1 - chancePerDrop, k);
+
+            resultElem.textContent =
+                `Drops left today: ${dropsLeftToday}\n` +
+                `Total codes left today: ${totalCodesToday}\n` +
+                `Chance to win at least once in ${k} drops: ${(chanceAtLeastOnce * 100).toFixed(2)}%`;
+
+            mathElem.textContent =
+                `Logical Steps:\n` +
+                `1. Figure out how many drops are left today: hours remaining × 2 (since 2 drops happen each hour).\n` +
+                `2. Work out how many codes will be given out in total: drops left × codes per drop.\n` +
+                `3. Work out the chance for one drop: codes per drop ÷ people per drop.\n` +
+                `4. Work out the chance for multiple drops: use repeated subtraction for division, and repeated addition for multiplication if calculating manually.\n` +
+                `   Formula: Chance at least once = 1 − (1 − chance per drop)^drops joined.\n\n` +
+                `Calculation Example:\n` +
+                `Step 1: ${hoursRemaining} × 2 = ${dropsLeftToday} drops\n` +
+                `Step 2: ${dropsLeftToday} × ${c} = ${totalCodesToday} codes\n` +
+                `Step 3: ${c} ÷ ${M} = ${(chancePerDrop*100).toFixed(2)}% chance per drop\n` +
+                `Step 4: 1 − (1 − ${chancePerDrop})^${k} = ${(chanceAtLeastOnce*100).toFixed(2)}% chance at least once.`;
+        });
+    </script>
+</body>
+</html>
